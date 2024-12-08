@@ -18,13 +18,22 @@ body {
 }
 
 .chat-header {
-    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 15px 20px;
     border-bottom: 1px solid #e0e0e0;
-    text-align: center;
+}
+
+.header-logo {
+    height: 30px;
+    width: auto;
 }
 
 .chat-header h1 {
-    font-size: 24px;
+    margin: 0;
+    font-size: 20px;
     color: #333;
 }
 
@@ -81,13 +90,58 @@ body {
     gap: 10px;
 }
 
+.chat-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.send-btn {
+    height: 40px;
+    padding: 0 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.send-btn:hover {
+    background-color: #0056b3;
+}
+
+.clear-chat-btn {
+    padding: 10px;
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    width: 40px;
+    height: 40px;
+}
+
+.clear-chat-btn:hover {
+    background-color: #f0f0f0;
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
 textarea {
     flex: 1;
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 5px;
     resize: none;
-    height: 60px;
+    height: 40px;
+    line-height: 20px;
+    font-size: 14px;
 }
 
 button {

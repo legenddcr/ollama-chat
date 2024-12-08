@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendButton = document.getElementById('sendButton');
     const newChatButton = document.getElementById('newChatButton');
     const conversationsList = document.getElementById('conversationsList');
+    const clearChatButton = document.getElementById('clearChatButton');
 
     let currentConversationId = null;
 
@@ -173,9 +174,53 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // 添加清除会话功能
+    async function clearCurrentChat() {
+        if (!currentConversationId) {
+            console.error('No active conversation');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/conversations/${currentConversationId}/clear`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // 清空聊天界面
+                chatMessages.innerHTML = '';
+                // 更新会话列表
+                await loadConversations();
+                // 可选：显示成功提示
+                console.log('Chat cleared successfully');
+            } else {
+                throw new Error(data.error || '清除失败');
+            }
+        } catch (error) {
+            console.error('清除会话失败:', error);
+            // 显示错误消息
+            addMessage('清除会话失败: ' + error.message, false);
+        }
+    }
+
     // 事件监听器
     sendButton.addEventListener('click', sendMessage);
     newChatButton.addEventListener('click', createNewConversation);
+    clearChatButton.addEventListener('click', async (e) => {
+        e.preventDefault(); // 防止表单提交
+        if (confirm('确定要清除当前会话的所有消息吗？')) {
+            await clearCurrentChat();
+        }
+    });
 
     messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {

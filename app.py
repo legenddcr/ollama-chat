@@ -112,5 +112,23 @@ def get_conversation(conversation_id):
         return jsonify(conversations[conversation_id])
     return jsonify({'error': '会话不存在'}), 404
 
+@app.route('/conversations/<conversation_id>/clear', methods=['POST'])
+def clear_conversation(conversation_id):
+    try:
+        if conversation_id in conversations:
+            # 保留ID和创建时间，清除消息
+            conversations[conversation_id]['messages'] = []
+            conversations[conversation_id]['title'] = f'新对话 {datetime.now().strftime("%Y-%m-%d %H:%M")}'
+            return jsonify({
+                'success': True,
+                'conversation': conversations[conversation_id]
+            })
+        return jsonify({'error': '会话不存在'}), 404
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'success': False
+        }), 500
+
 if __name__ == '__main__':
     app.run(debug=True) 

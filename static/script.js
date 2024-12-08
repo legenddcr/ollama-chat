@@ -150,8 +150,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const message = messageInput.value.trim();
         if (!message) return;
 
-        addMessage(message, true);
+        // 清空输入框并添加用户消息
         messageInput.value = '';
+        addMessage(message, true);
+
+        // 创建一个消息容器用于流式输出
+        const containerDiv = document.createElement('div');
+        containerDiv.className = 'message-container bot-message-container';
+        
+        // 添加模型标签
+        const labelDiv = document.createElement('div');
+        labelDiv.className = 'model-label';
+        labelDiv.textContent = 'Qwen2.5-Coder';
+        containerDiv.appendChild(labelDiv);
+
+        // 创建消息div
+        const messageDiv = document.createElement('div');
+        messageDiv.className = 'message bot-message';
+        containerDiv.appendChild(messageDiv);
+        chatMessages.appendChild(containerDiv);
 
         try {
             const response = await fetch('/chat', {
@@ -162,16 +179,63 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({ message }),
             });
 
-            const data = await response.json();
-            
-            if (data.success) {
-                addMessage(data.response, false, data.model);
-            } else {
-                addMessage('错误: ' + (data.error || '未知错误'));
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let fullResponse = '';
+
+            while (true) {
+                const { value, done } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value);
+                const lines = chunk.split('\n');
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+                            fullResponse += data.chunk;
+                            
+                            // 使用marked实时渲染Markdown
+                            messageDiv.innerHTML = marked.parse(fullResponse);
+                            
+                            // 添加代码块的复制按钮
+                            messageDiv.querySelectorAll('pre code').forEach((block) => {
+                                if (!block.parentNode.querySelector('.copy-button')) {
+                                    const copyButton = document.createElement('button');
+                                    copyButton.className = 'copy-button';
+                                    copyButton.textContent = '复制';
+                                    block.parentNode.insertBefore(copyButton, block);
+
+                                    copyButton.addEventListener('click', async () => {
+                                        try {
+                                            await navigator.clipboard.writeText(block.textContent);
+                                            copyButton.textContent = '已复制!';
+                                            setTimeout(() => {
+                                                copyButton.textContent = '复制';
+                                            }, 2000);
+                                        } catch (err) {
+                                            console.error('复制失败:', err);
+                                        }
+                                    });
+                                }
+                            });
+
+                            // 滚动到底部
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        } catch (e) {
+                            console.error('解析响应数据失败:', e);
+                        }
+                    }
+                }
             }
         } catch (error) {
-            addMessage('发送消息时出错: ' + error.message);
+            console.error('发送消息失败:', error);
+            messageDiv.textContent = '发送消息时出错: ' + error.message;
         }
+
+        // 滚动到底部
+        chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
     // 添加清除会话功能

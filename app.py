@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, session, Response
 import requests
+import json
 from datetime import datetime
 import uuid
 
@@ -47,35 +48,44 @@ def chat():
         context = "\n".join(
             f"{msg['role']}: {msg['content']}" for msg in conversations[conversation_id]['messages']
         )
-        
-        # 与Ollama API通信
-        model_name = "Qwen2.5-Coder"  # 模型名称
-        response = requests.post('http://localhost:11434/api/generate', 
-            json={
-                "model": "qwen2.5-coder",
-                "prompt": context,
-                "stream": False
-            })
-        
-        if response.status_code == 200:
-            ai_response = response.json()['response']
-            # 保存AI响应，包含模型信息
-            conversations[conversation_id]['messages'].append({
-                'role': 'assistant',
-                'content': ai_response,
-                'model': model_name,
-                'timestamp': datetime.now().isoformat()
-            })
-            return jsonify({
-                'response': ai_response,
-                'model': model_name,
-                'success': True
-            })
-        else:
-            return jsonify({
-                'error': '无法获取响应',
-                'success': False
-            })
+
+        def generate():
+            model_name = "Qwen2.5-Coder"
+            full_response = ""
+            
+            # 使用stream模式与Ollama API通信
+            response = requests.post(
+                'http://localhost:11434/api/generate',
+                json={
+                    "model": "qwen2.5-coder",
+                    "prompt": context,
+                    "stream": True
+                },
+                stream=True
+            )
+
+            for line in response.iter_lines():
+                if line:
+                    try:
+                        json_response = json.loads(line)
+                        if 'response' in json_response:
+                            chunk = json_response['response']
+                            full_response += chunk
+                            yield f"data: {json.dumps({'chunk': chunk, 'done': json_response.get('done', False)})}\n\n"
+                        
+                        # 当流结束时保存完整响应
+                        if json_response.get('done', False):
+                            conversations[conversation_id]['messages'].append({
+                                'role': 'assistant',
+                                'content': full_response,
+                                'model': model_name,
+                                'timestamp': datetime.now().isoformat()
+                            })
+                    except json.JSONDecodeError as e:
+                        print(f"JSON decode error: {e}")
+                        continue
+
+        return Response(generate(), mimetype='text/event-stream')
             
     except Exception as e:
         return jsonify({

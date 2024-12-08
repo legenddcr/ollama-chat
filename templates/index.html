@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama 聊天</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>Ollama 聊天助手</h1>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- 消息将在这里动态添加 -->
+        </div>
+        <div class="chat-input">
+            <textarea id="messageInput" placeholder="输入您的问题..."></textarea>
+            <button id="sendButton">发送</button>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

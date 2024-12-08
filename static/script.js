@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 显示会话消息历史
             conversation.messages.forEach(message => {
-                addMessage(message.content, message.role === 'user');
+                addMessage(message.content, message.role === 'user', message.role === 'assistant' ? message.model : null);
             });
             
             // 更新会话列表中的活动状态
@@ -95,20 +95,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function addMessage(message, isUser = false) {
+    function addMessage(message, isUser = false, modelName = null) {
+        const containerDiv = document.createElement('div');
+        containerDiv.className = `message-container ${isUser ? 'user-message-container' : 'bot-message-container'}`;
+
+        if (!isUser && modelName) {
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'model-label';
+            labelDiv.textContent = modelName;
+            containerDiv.appendChild(labelDiv);
+        }
+
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        
+
         if (isUser) {
-            // 用户消息使用纯文本
             const textNode = document.createTextNode(message);
             messageDiv.appendChild(textNode);
         } else {
             try {
-                // AI响应需要Markdown渲染
                 messageDiv.innerHTML = marked.parse(message);
                 
-                // 处理代码块的复制功能
                 messageDiv.querySelectorAll('pre code').forEach((block) => {
                     const copyButton = document.createElement('button');
                     copyButton.className = 'copy-button';
@@ -132,8 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 messageDiv.textContent = message;
             }
         }
-        
-        chatMessages.appendChild(messageDiv);
+
+        containerDiv.appendChild(messageDiv);
+        chatMessages.appendChild(containerDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
@@ -156,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             if (data.success) {
-                addMessage(data.response);
+                addMessage(data.response, false, data.model);
             } else {
                 addMessage('错误: ' + (data.error || '未知错误'));
             }

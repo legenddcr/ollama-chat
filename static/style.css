@@ -35,30 +35,34 @@ body {
     background-color: #fff;
     display: flex;
     flex-direction: column;
+    gap: 16px;
 }
 
 .message {
-    margin-bottom: 20px;
-    padding: 15px 20px;
-    border-radius: 10px;
-    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 15px;
     white-space: pre-wrap;
     word-break: break-word;
-    display: block;
+    line-height: 1.5;
+    width: fit-content;
+    min-width: 100px;
+    max-width: 100%;
+    box-sizing: border-box;
+    position: relative;
 }
 
 .user-message {
-    background-color: #007bff;
+    background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
-    margin-left: auto;
-    margin-right: 20px;
-    text-align: left;
+    border-top-right-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bot-message {
-    background-color: #f8f9fa;
+    background-color: #f1f1f1;
     color: #333;
-    margin-left: 20px;
+    border-top-left-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bot-message code {
@@ -171,26 +175,25 @@ button:hover {
 /* Markdown样式 */
 .markdown-body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
+    font-size: 15px;
+    line-height: 1.6;
     word-wrap: break-word;
     color: inherit;
 }
 
 .markdown-body pre {
+    margin: 10px 0;
     background-color: #f6f8fa;
-    border-radius: 6px;
-    padding: 16px;
-    overflow: auto;
-    margin: 8px 0;
+    border-radius: 8px;
+    padding: 12px;
+    position: relative;
 }
 
 .markdown-body code {
-    background-color: rgba(175, 184, 193, 0.2);
-    border-radius: 6px;
-    padding: 0.2em 0.4em;
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
-    font-size: 85%;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 13px;
+    padding: 2px 6px;
+    border-radius: 4px;
 }
 
 .markdown-body pre code {
@@ -213,7 +216,11 @@ button:hover {
 }
 
 .markdown-body p {
-    margin-bottom: 16px;
+    margin: 0 0 10px 0;
+}
+
+.markdown-body p:last-child {
+    margin-bottom: 0;
 }
 
 .markdown-body ul,
@@ -241,11 +248,7 @@ button:hover {
     border-radius: 4px;
     cursor: pointer;
     opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.markdown-body pre {
-    position: relative;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
 }
 
 .markdown-body pre:hover .copy-button {
@@ -279,4 +282,56 @@ button:hover {
 .user-message code {
     color: #333;
     background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 模型标签样式 */
+.message-container {
+    margin-bottom: 20px;
+    width: fit-content;
+    max-width: 85%;
+    display: flex;
+    flex-direction: column;
+}
+
+.bot-message-container {
+    margin-left: 20px;
+    align-self: flex-start;
+}
+
+.user-message-container {
+    margin-right: 20px;
+    align-self: flex-end;
+}
+
+.model-label {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+    padding-left: 4px;
+    display: flex;
+    align-items: center;
+    opacity: 0.8;
+}
+
+.model-label::before {
+    content: "🤖";
+    margin-right: 6px;
+}
+
+/* 滚动条美化 */
+.chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #999;
 }

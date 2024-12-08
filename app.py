@@ -43,24 +43,32 @@ def chat():
             'timestamp': datetime.now().isoformat()
         })
         
+        # 构建上下文
+        context = "\n".join(
+            f"{msg['role']}: {msg['content']}" for msg in conversations[conversation_id]['messages']
+        )
+        
         # 与Ollama API通信
+        model_name = "Qwen2.5-Coder"  # 模型名称
         response = requests.post('http://localhost:11434/api/generate', 
             json={
                 "model": "qwen2.5-coder",
-                "prompt": message,
+                "prompt": context,
                 "stream": False
             })
         
         if response.status_code == 200:
             ai_response = response.json()['response']
-            # 保存AI响应
+            # 保存AI响应，包含模型信息
             conversations[conversation_id]['messages'].append({
                 'role': 'assistant',
                 'content': ai_response,
+                'model': model_name,
                 'timestamp': datetime.now().isoformat()
             })
             return jsonify({
                 'response': ai_response,
+                'model': model_name,
                 'success': True
             })
         else:

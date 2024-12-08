@@ -82,7 +82,6 @@ cd ollama-web-chat
 
 2. 安装后端依赖：
 ```bash
-cd backend
 pip install -r requirements.txt
 ```
 
@@ -93,7 +92,6 @@ ollama serve
 
 4. 启动Flask应用：
 ```bash
-pip install -r requirements.txt
 python app.py
 ```
 

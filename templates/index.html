@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="{{ url_for('static', filename='images/logo.svg') }}" type="image/svg+xml">
     <title>Ollama 聊天</title>
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
@@ -22,7 +24,7 @@
                 <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="Ollama Logo" class="header-logo">
                 <h1>Ollama 聊天助手</h1>
             </div>
-            <div class="chat-messages" id="chatMessages">
+            <div class="chat-messages markdown-body" id="chatMessages">
                 <!-- 消息将在这里动态添加 -->
             </div>
             <div class="chat-input">
@@ -31,6 +33,16 @@
             </div>
         </div>
     </div>
+
+    <!-- 先加载第三方库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <!-- 常用语言包 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+    <!-- Marked库 -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/lib/marked.umd.min.js"></script>
+    <!-- 最后加载应用脚本 -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html> 

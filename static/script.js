@@ -1,4 +1,32 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // 配置marked选项
+    marked.setOptions({
+        highlight: function(code, language) {
+            if (language && hljs.getLanguage(language)) {
+                try {
+                    return hljs.highlight(code, { language }).value;
+                } catch (err) {
+                    console.error('Highlight error:', err);
+                }
+            }
+            try {
+                return hljs.highlightAuto(code).value;
+            } catch (err) {
+                console.error('Highlight error:', err);
+                return code;
+            }
+        },
+        breaks: true,
+        gfm: true,
+        headerIds: true,
+        mangle: false
+    });
+
+    // 初始化highlight.js
+    hljs.configure({
+        ignoreUnescapedHTML: true
+    });
+
     const chatMessages = document.getElementById('chatMessages');
     const messageInput = document.getElementById('messageInput');
     const sendButton = document.getElementById('sendButton');
@@ -70,7 +98,41 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(message, isUser = false) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
-        messageDiv.textContent = message;
+        
+        if (isUser) {
+            // 用户消息使用纯文本
+            const textNode = document.createTextNode(message);
+            messageDiv.appendChild(textNode);
+        } else {
+            try {
+                // AI响应需要Markdown渲染
+                messageDiv.innerHTML = marked.parse(message);
+                
+                // 处理代码块的复制功能
+                messageDiv.querySelectorAll('pre code').forEach((block) => {
+                    const copyButton = document.createElement('button');
+                    copyButton.className = 'copy-button';
+                    copyButton.textContent = '复制';
+                    block.parentNode.insertBefore(copyButton, block);
+
+                    copyButton.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(block.textContent);
+                            copyButton.textContent = '已复制!';
+                            setTimeout(() => {
+                                copyButton.textContent = '复制';
+                            }, 2000);
+                        } catch (err) {
+                            console.error('复制失败:', err);
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error('Markdown解析错误:', err);
+                messageDiv.textContent = message;
+            }
+        }
+        
         chatMessages.appendChild(messageDiv);
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }

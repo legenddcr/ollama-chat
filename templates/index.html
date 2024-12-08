@@ -7,16 +7,26 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            <h1>Ollama 聊天助手</h1>
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="newChatButton" class="new-chat-btn">新建对话</button>
+            </div>
+            <div class="conversations-list" id="conversationsList">
+                <!-- 会话列表将在这里动态添加 -->
+            </div>
         </div>
-        <div class="chat-messages" id="chatMessages">
-            <!-- 消息将在这里动态添加 -->
-        </div>
-        <div class="chat-input">
-            <textarea id="messageInput" placeholder="输入您的问题..."></textarea>
-            <button id="sendButton">发送</button>
+        <div class="chat-container">
+            <div class="chat-header">
+                <h1>Ollama 聊天助手</h1>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <!-- 消息将在这里动态添加 -->
+            </div>
+            <div class="chat-input">
+                <textarea id="messageInput" placeholder="输入您的问题..."></textarea>
+                <button id="sendButton">发送</button>
+            </div>
         </div>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
